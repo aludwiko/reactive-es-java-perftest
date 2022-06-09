@@ -50,6 +50,42 @@
                     <!-- Enterprise Self-Hosted configuration reference: https://gatling.io/docs/gatling/reference/current/extensions/maven_plugin/#working-with-gatling-enterprise-self-hosted -->
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.39.1</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>%a</name>
+                            <build>
+                                <from>maven:3.8.3-openjdk-17</from>
+                                <tags>
+                                    <tag>latest</tag>
+                                </tags>
+                                <!-- @formatter:off -->
+                                <cmd>mvn -f maven gatling:test -Dgatling.simulationClass=$SIMULATION_CLASS</cmd>
+                                <!-- @formatter:off -->
+                                <assembly>
+                                    <descriptorRef>project</descriptorRef>
+                                </assembly>
+                                <ports>
+                                    <port>8080</port>
+                                </ports>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-docker-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

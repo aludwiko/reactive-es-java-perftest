@@ -2,12 +2,13 @@ package perftest;
 
 import io.gatling.javaapi.core.ScenarioBuilder;
 
-import static io.gatling.javaapi.core.CoreDsl.atOnceUsers;
+import static io.gatling.javaapi.core.CoreDsl.constantUsersPerSec;
 import static io.gatling.javaapi.core.CoreDsl.exec;
+import static io.gatling.javaapi.core.CoreDsl.rampUsersPerSec;
 import static io.gatling.javaapi.core.CoreDsl.scenario;
 import static io.gatling.javaapi.http.HttpDsl.http;
 
-public class SimpleScenarioSimulation extends BasicSimulation {
+public class SerialReservationSimulation extends BasicSimulation {
 
     ScenarioBuilder simpleScenario = scenario("Create show and reserve seats")
             .feed(showIdsFeeder)
@@ -22,6 +23,7 @@ public class SimpleScenarioSimulation extends BasicSimulation {
             );
 
     {
-        setUp(simpleScenario.injectOpen(atOnceUsers(10)).protocols(httpProtocol));
+        setUp(simpleScenario.injectOpen(rampUsersPerSec(1).to(usersPerSec).during(15), constantUsersPerSec(usersPerSec).during(duringSec))
+                .protocols(httpProtocol));
     }
 }

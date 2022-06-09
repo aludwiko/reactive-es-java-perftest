@@ -1,5 +1,7 @@
 package perftest;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import io.gatling.javaapi.core.Body;
 import io.gatling.javaapi.core.Simulation;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
@@ -17,11 +19,16 @@ import static io.gatling.javaapi.http.HttpDsl.http;
 
 abstract class BasicSimulation extends Simulation {
 
-    static int maxSeats = 100;
-    static List<Integer> randomSeatNums = List.range(0, maxSeats).shuffle();
+    private Config config = ConfigFactory.load();
+    private Config simulationConfig = config.getConfig("simulation-config");
+    private String baseUrl = simulationConfig.getString("base-url");
+    int maxSeats = simulationConfig.getInt("max-seats");
+    int usersPerSec = simulationConfig.getInt("users-per-sec");
+    int duringSec = simulationConfig.getInt("during-sec");
+    List<Integer> randomSeatNums = List.range(0, maxSeats).shuffle();
 
     HttpProtocolBuilder httpProtocol = http
-            .baseUrl("http://localhost:8080/")
+            .baseUrl(baseUrl)
             .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             .acceptEncodingHeader("gzip, deflate")
             .acceptLanguageHeader("en-US,en;q=0.5")
